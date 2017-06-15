@@ -3,18 +3,33 @@ var fractionLookups = {};
 var locations = [
 	{ id: "lost", name: "Lost" },
 	{ id: "earth", name: "Earth" },
-	{ id: "earth_suborb", name: "Suborbital Flight" },
-	{ id: "lunar_flyby", name: "Lunar Fly-By" },
 	{ id: "earth_orbit", name: "Earth Orbit" },
+	{ id: "lunar_flyby", name: "Lunar Fly-By" },
 	{ id: "lunar_orbit", name: "Lunar Orbit" },
-	{ id: "moon", name: "Moon" }
+	{ id: "moon", name: "Moon" },
+	{ id: "earth_suborb", name: "Suborbital Flight" }
 ];
 
 var maneuvers = [
+	{ difficulty: 8, from: "earth", to: "earth_orbit" },
+	{ difficulty: 3, from: "earth", to: "earth_suborb" },
+	{ difficulty: 0, from: "earth_suborb", to: "earth" },
+	{ difficulty: 5, from: "earth_suborb", to: "earth_orbit" },
+	{ difficulty: 0, from: "earth_orbit", to: "earth" },
+	{ difficulty: 1, from: "earth_orbit", to: "lunar_flyby" },
+	{ difficulty: 3, from: "earth_orbit", to: "lunar_orbit" },
+	{ difficulty: 3, from: "lunar_orbit", to: "earth_orbit" },
+	{ difficulty: 2, from: "lunar_orbit", to: "moon" },
+	{ difficulty: 1, from: "lunar_flyby", to: "earth_orbit" },
+	{ difficulty: 2, from: "lunar_flyby", to: "lunar_orbit" },
+	{ difficulty: 4, from: "lunar_flyby", to: "moon" },
+	{ difficulty: 2, from: "moon", to: "lunar_orbit" },
+	/*
 	{ name: "Lunar Descent", difficulty: 2 },
 	{ name: "Lunar Transfer", difficulty: 3 },
 	{ name: "To Orbit", difficulty: 5 },
 	{ name: "Launch", difficulty: 3 },
+		*/
 ];
 
 var rockets = [
@@ -26,7 +41,28 @@ var rockets = [
 
 function padName(n, amt) {
 	return ("&nbsp;".repeat(amt)) + n + ("&nbsp;".repeat(amt));
-	// return "&nbsp;&nbsp;" + n + "&nbsp;&nbsp;";
+}
+
+function getLocationById(locId) {
+	for (var i = 0 ; i < locations.length ; i++) {
+		if (locations[i].id == locId) {
+			return locations[i];
+		}
+	}
+	return null;
+}
+
+function getManeuverByEndpoints(endpoints) {
+	var chunks = endpoints.split(":");
+	var from = chunks[0];
+	var to = chunks[1];
+
+	for (var i = 0 ; i < maneuvers.length ; i++) {
+		if (maneuvers[i].from == from && maneuvers[i].to == to) {
+			return maneuvers[i];
+		}
+	}
+	return null;
 }
 
 function calculateMaxIonPayload(diff, year) {
@@ -150,10 +186,39 @@ function setup() {
 	buildMaxRocketPayloadChart();
 	buildMaxIonPayloadChart();
 
-	setupManeuverBox();
+	setupDestinationBox();
+
 	$("td.payload_mass input").change(function() {
 		recalcForRow($(this).parents("tr"));
 	});
+}
+
+function findManeuversToReach(loc) {
+	console.log("user wants to go to [" + loc.name + "]...");
+	var rv = [];
+	for (var i = 0 ; i < maneuvers.length ; i++) {
+		if (maneuvers[i].to == loc.id) {
+			rv.push(maneuvers[i]);
+		}
+	}
+	console.log(rv);
+	return rv;
+}
+
+function onDestinationBoxChanged() {
+	var changedBox = $(this);
+	var changedRow = changedBox.parents("tr");
+
+
+	if (changedBox.val() != -1) {
+		var destination = locations[changedBox.val()];
+
+		var possibleManeuvers = findManeuversToReach(destination);
+		setPossibleManeuvers(possibleManeuvers);
+	} else {
+		setPossibleManeuvers([]);
+	}
+
 }
 
 function onManeuverBoxChanged() {
@@ -161,11 +226,13 @@ function onManeuverBoxChanged() {
 	var changedRow = changedBox.parents("tr");
 	var diffBox = changedRow.find("td div.difficulty");
 
-	if (changedBox.val() == "-1") {
+	if (changedBox.val() == "") {
 		diffBox.html("");
 	} else {
-		var selectedManeuver = maneuvers[changedBox.val()];
-		diffBox.html(selectedManeuver.difficulty);
+		// var selectedManeuver = maneuvers[changedBox.val()];
+		// diffBox.html(selectedManeuver.difficulty);
+		var maneuver = getManeuverByEndpoints(changedBox.val());
+		diffBox.html(maneuver.difficulty);
 	}
 
 	recalcForRow(changedRow);
@@ -180,12 +247,24 @@ function recalcForRow(r) {
 	r.find("div.required_thrust").html(requiredThrust);
 }
 
-function setupManeuverBox() {
-	var maneuverBox = $("td.maneuver select");
-	$("<option value='-1'></option>").appendTo(maneuverBox);
-	for (var i = 0 ; i < maneuvers.length ; i++) {
-		var maneuver = maneuvers[i];
-		$("<option value='" + i + "'>" + maneuver.name + "</option>").appendTo(maneuverBox);
+function setupDestinationBox() {
+	var destBox = $("td.destination select");
+	$("<option value='-1'></option>").appendTo(destBox);
+	for (var i = 1 ; i < locations.length ; i++) { // start at 1 so we skip "Lost"
+		var loc = locations[i];
+		$("<option value='" + i + "'>" + loc.name + "</option>").appendTo(destBox);
+	}
+
+	destBox.change(onDestinationBoxChanged);
+}
+
+function setPossibleManeuvers(possibilities) {
+	var maneuverBox = $("td.maneuver select").empty();
+	$("<option value=''></option>").appendTo(maneuverBox);
+	for (var i = 0 ; i < possibilities.length ; i++) {
+		var maneuver = possibilities[i];
+		var fromLoc = getLocationById(maneuver.from);
+		$("<option value='" + maneuver.from + ":" + maneuver.to + "'>" + fromLoc.name + "</option>").appendTo(maneuverBox);
 	}
 
 	maneuverBox.change(onManeuverBoxChanged);

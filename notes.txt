@@ -1,0 +1,4 @@
+TODO:
+* rewrite with real model and not just repurposed DOM model
+* build UI for adding/removing rockets/payload (tracking when they were added)
+* handle taking extra time, doubled difficulty, etc.

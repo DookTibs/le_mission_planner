@@ -1,0 +1,55 @@
+input[type="number"] {
+	width: 80px;
+}
+
+table.max_rocket_payload_chart {
+	margin-left: -170px;
+	border-collapse: collapse;
+	display: inline-block;
+}
+
+table.max_ion_payload_chart {
+	margin-left: -50px;
+	border-collapse: collapse;
+	display: inline-block;
+}
+
+table.mission_planner {
+	border-collapse: collapse;
+}
+
+table.mission_planner tr th{
+	border-bottom: solid;
+	border-width: thin;
+}
+
+
+.centered {
+	text-align: center;
+}
+
+.legend {
+	font-style: italic;
+	text-align: center;
+}
+
+.vert {
+	transform: rotate(270deg);
+	width: 200px;
+	vertical-align: bottom;
+	padding-bottom: 5px;
+}
+
+.right_bordered {
+	border-right: solid;
+	border-width: thin;
+}
+
+.bottom_bordered {
+	border-bottom: solid;
+	border-width: thin;
+}
+
+div.payload_charts {
+	margin-bottom: 25px;
+}

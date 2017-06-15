@@ -26,6 +26,7 @@ function ChartBuilder() {
 	};
 
 	this.buildMaxIonPayloadChart = function() {
+		var hourglass = "&#8987;";
 		var maxDifficulty = 9;
 		var maxYears = 8;
 		var table = $("table.max_ion_payload_chart");
@@ -36,13 +37,13 @@ function ChartBuilder() {
 			if (diff == 1) {
 				var headerRow = $("<tr/>");
 				$("<td/>").attr("colspan", 2).appendTo(headerRow);
-				$("<td/>").attr("colspan", maxYears).addClass("legend horiz").html("max payload mass: ion thrusters").appendTo(headerRow);
+				$("<td/>").attr("colspan", maxYears).addClass("legend horiz").html("max payload mass: ion thrusters (mass=" + ionThruster.mass + ", thrust/" + hourglass + "=" + ionThruster.thrustPerYear + ")").appendTo(headerRow);
 				headerRow.appendTo(table);
 
 				headerRow = $("<tr/>");
 				$("<td/>").attr("colspan", 2).appendTo(headerRow);
 				for (var year = 1 ; year <= maxYears ; year++) {
-					$("<td/>").html(this.padName(year + "&#8987;", 4)).addClass("bottom_bordered centered").appendTo(headerRow);
+					$("<td/>").html(this.padName(year + hourglass, 4)).addClass("bottom_bordered centered").appendTo(headerRow);
 				}
 				headerRow.appendTo(table);
 			}
@@ -76,7 +77,7 @@ function ChartBuilder() {
 				headerRow = $("<tr/>");
 				$("<td/>").attr("colspan", 2).appendTo(headerRow);
 				for (var i = 0 ; i < rockets.length ; i++) {
-					$("<td/>").html(this.padName(rockets[i].name, 2)).addClass("bottom_bordered centered").appendTo(headerRow);
+					$("<td/>").html(rockets[i].name + "<br><i>(mass=" + rockets[i].mass + ",<br>" + this.padName("thrust=" + rockets[i].thrust + ")", 2) + "</i>").addClass("bottom_bordered centered").appendTo(headerRow);
 				}
 				headerRow.appendTo(table);
 			}

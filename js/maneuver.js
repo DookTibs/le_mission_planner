@@ -4,6 +4,10 @@ function Maneuver(difficulty, from, to) {
 	this.difficulty = difficulty;
 	this.from = from;
 	this.to = to;
+
+	this.toString = function() {
+		return "{Maneuver " + this.from + " -> " + this.to + " (diff=" + this.difficulty + ")}";
+	};
 }
 
 function getManeuverByEndpoints(endpoints) {

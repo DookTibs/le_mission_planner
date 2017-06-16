@@ -2,7 +2,12 @@
 	<head>
 		<title>Leaving Earth Mission Planner</title>
 		<link rel="stylesheet" type="text/css" href="css/earth.css">
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<!-- <script src="js/jquery.min.js"></script> -->
+		<script src="js/payload.js"></script>
+		<script src="js/leg.js"></script>
 		<script src="js/location.js"></script>
 		<script src="js/maneuver.js"></script>
 		<script src="js/rocket.js"></script>
@@ -13,16 +18,16 @@
 
 	<body>
 
-		<div class='payload_charts'>
-			<table class='max_rocket_payload_chart'></table>
-			<table class='max_ion_payload_chart'></table>
+		<div class="payload_charts">
+			<table class="max_rocket_payload_chart"></table>
+			<table class="max_ion_payload_chart"></table>
 		</div>
 
-		<div class='mission'>
-			<table class='mission_planner'>
+		<div class="mission">
+			<table class="mission_planner">
 				<tr>
-					<th>Destination</th>
-					<th>From</th>
+					<th width=12%>Destination</th>
+					<th width=13%>From</th>
 					<th>Difficulty</th>
 					<th>Payload</th>
 					<th>Payload Mass</th>
@@ -30,17 +35,26 @@
 					<th>Rockets</th>
 					<th>Rocket Mass</th>
 				</tr>
-				<tr>
-					<td class='destination'><select/></td>
-					<td class='maneuver'><select/></td>
-					<td><div class='difficulty centered'/></td>
-					<td><input type="text"/></td>
-					<td class='payload_mass'><input type="number"/></td>
-					<td><div class='required_thrust centered'/></td>
+				<tr class="leg">
+					<td class="destination"><select/></td>
+					<td class="maneuver"><select/></td>
+					<td><div class="difficulty centered"/></td>
+					<td><a href="#" class="payload_picker"></a></td>
+					<td class="payload_mass"><input type="number"/></td>
+					<td><div class="required_thrust centered"/></td>
 					<td><input type="text"/></td>
 					<td><input type="number"/></td>
 				</tr>
 			</table>
 		</div>
+
+		<div id="payload_dialog">
+			<h3>Edit Payload</h3>
+
+			<div class="items">
+			</div>
+		</div>
+
+		<div id="debug"></div>
 	</body>
 </html>

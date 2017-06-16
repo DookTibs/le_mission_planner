@@ -1,3 +1,7 @@
+div.payload_charts, div.mission {
+	width: 1000px;
+}
+
 input[type="number"] {
 	width: 80px;
 }
@@ -16,6 +20,7 @@ table.max_ion_payload_chart {
 
 table.mission_planner {
 	border-collapse: collapse;
+	width: 100%;
 }
 
 table.mission_planner tr th{
@@ -23,6 +28,9 @@ table.mission_planner tr th{
 	border-width: thin;
 }
 
+select {
+	width: 100%;
+}
 
 .centered {
 	text-align: center;
@@ -52,4 +60,35 @@ table.mission_planner tr th{
 
 div.payload_charts {
 	margin-bottom: 25px;
+}
+
+div.popup_config {
+	width: 100%;
+}
+
+div.popup_config .minus {
+	padding-right: 5px;
+}
+
+div.popup_config .title {
+	display: inline-block;
+	width: 75%;
+}
+
+div.popup_config .plus{
+	float: right;
+}
+
+div.popup_config[data-amount="0"]  span.title {
+	font-style: italic;
+	text-decoration: line-through;
+	color: grey;
+}
+
+button {
+	cursor: pointer;
+}
+
+button:disabled {
+	cursor: not-allowed;
 }

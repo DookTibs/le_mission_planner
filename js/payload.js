@@ -5,6 +5,15 @@ function Payload(name, mass) {
 	this.mass = mass;
 }
 
+function getPayloadByName(name) {
+	for (var i = 0 ; i < payloads.length ; i++) {
+		if (payloads[i].name == name) {
+			return payloads[i];
+		}
+	}
+	return null;
+}
+
 payloads.push(new Payload("Astronaut", 0));
 payloads.push(new Payload("Capsule: Aldrin", 3));
 payloads.push(new Payload("Capsule: Apollo", 3));

@@ -36,6 +36,7 @@ function recalc(fromIndex) {
 function setupPayloadDialog() {
 	$("#payload_dialog").dialog({
 		autoOpen: false,
+		close: savePopupItems,
 		modal: true
 	});
 
@@ -57,6 +58,27 @@ function setupPayloadDialog() {
 	}
 
 	$("#payload_dialog button").click(addOrRemovePopupItem);
+}
+
+function savePopupItems() {
+	var d = $(this);
+
+	// TODO - work for more than payloads
+	var itemsAndAmounts = [];
+	for (var i = 0 ; i < payloads.length ; i++) {
+		var item = payloads[i];
+		var row = d.find("div.popup_config:eq(" + i + ")");
+		var amt = row.attr("data-amount");
+
+		if (amt > 0) {
+			console.log("[" +i + "] [" + row.attr("data-itemname") + "] / [" + row.attr("data-amount") + "]");
+			var combo = { payload: getPayloadByName(row.attr("data-itemname")), amount: amt };
+			itemsAndAmounts.push(combo);
+		}
+	}
+
+	var legIndex = 0; // TODO -dont hardcode leg index
+	mission.legs[legIndex].payloadItems = itemsAndAmounts;
 }
 
 function addOrRemovePopupItem() {

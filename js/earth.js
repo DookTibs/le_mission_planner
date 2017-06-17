@@ -36,6 +36,8 @@ function recalc(fromIndex) {
 function setupPayloadDialog() {
 	$("#payload_dialog").dialog({
 		autoOpen: false,
+		width: 400,
+		height: 390,
 		close: savePopupItems,
 		modal: true
 	});
@@ -98,13 +100,13 @@ function setup() {
 	var chartBuilder = new ChartBuilder();
 	chartBuilder.renderCharts();
 
-	setupDestinationBox();
+	setupOriginBox();
 	$("a.payload_picker").html("None").click(editPayload);
 	var l = new ManeuverLeg(null);
 	mission.legs.push(l);
 	recalc();
 
-	editPayload();
+	// editPayload();
 
 	/*
 	$("td.payload_mass input").change(function() {
@@ -113,24 +115,24 @@ function setup() {
 	*/
 }
 
-function onDestinationBoxChanged() {
+function onOriginBoxChanged() {
 	var changedBox = $(this);
 	var changedRow = changedBox.parents("tr");
 	var legIndex = changedRow.index() - 1;
 	mission.legs[legIndex].maneuver = null;
 
 	if (changedBox.val() != -1) {
-		var destination = locations[changedBox.val()];
-		var possibleManeuvers = destination.findManeuversThatReach();
-		setPossibleManeuvers(possibleManeuvers);
+		var origin = getLocationById(changedBox.val());
+		var possibleManeuvers = origin.findManeuversFrom();
+		setPossibleDestinations(possibleManeuvers);
 	} else {
-		setPossibleManeuvers([]);
+		setPossibleDestinations([]);
 	}
 
 	recalc(legIndex);
 }
 
-function onManeuverBoxChanged() {
+function onDestinationBoxChanged() {
 	var changedBox = $(this);
 	var changedRow = changedBox.parents("tr");
 	var legIndex = changedRow.index() - 1;
@@ -138,7 +140,9 @@ function onManeuverBoxChanged() {
 	if (changedBox.val() == "") {
 		mission.legs[legIndex].maneuver = null;
 	} else {
-		mission.legs[legIndex].maneuver = getManeuverByEndpoints(changedBox.val());
+		var endpoints = changedRow.find("td.origin select").val() + ":" + changedBox.val();
+		console.log(endpoints);
+		mission.legs[legIndex].maneuver = getManeuverByEndpoints(endpoints);
 	}
 
 	recalc(legIndex);
@@ -157,27 +161,27 @@ function recalcForRow(r) {
 }
 */
 
-function setupDestinationBox() {
-	var destBox = $("td.destination select");
-	$("<option value='-1'></option>").appendTo(destBox);
+function setupOriginBox() {
+	var originBox = $("td.origin select");
+	$("<option value='-1'></option>").appendTo(originBox);
 	for (var i = 1 ; i < locations.length ; i++) { // start at 1 so we skip "Lost"
 		var loc = locations[i];
-		$("<option value='" + i + "'>" + loc.name + "</option>").appendTo(destBox);
+		$("<option value='" + loc.id + "'>" + loc.name + "</option>").appendTo(originBox);
 	}
 
-	destBox.change(onDestinationBoxChanged);
+	originBox.change(onOriginBoxChanged);
 }
 
-function setPossibleManeuvers(possibilities) {
-	var maneuverBox = $("td.maneuver select").empty();
-	$("<option value=''></option>").appendTo(maneuverBox);
+function setPossibleDestinations(possibilities) {
+	var destinationBox = $("td.destination select").empty();
+	$("<option value=''></option>").appendTo(destinationBox);
 	for (var i = 0 ; i < possibilities.length ; i++) {
 		var maneuver = possibilities[i];
-		var fromLoc = getLocationById(maneuver.from);
-		$("<option value='" + maneuver.from + ":" + maneuver.to + "'>" + fromLoc.name + "</option>").appendTo(maneuverBox);
+		var toLoc = getLocationById(maneuver.to);
+		$("<option value='" + maneuver.to + "'>" + toLoc.name + "</option>").appendTo(destinationBox);
 	}
 
-	maneuverBox.change(onManeuverBoxChanged);
+	destinationBox.change(onDestinationBoxChanged);
 }
 
 function editPayload() {

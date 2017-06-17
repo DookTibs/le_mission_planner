@@ -16,6 +16,18 @@ function Location(id, name) {
 		return rv;
 	}
 
+	this.findManeuversFrom = function() {
+		console.log("mission planner wants to go from [" + this.name + "]...");
+		var rv = [];
+		for (var i = 0 ; i < maneuvers.length ; i++) {
+			if (maneuvers[i].from == this.id) {
+				rv.push(maneuvers[i]);
+			}
+		}
+		console.log(rv);
+		return rv;
+	}
+
 }
 
 function getLocationById(locId) {

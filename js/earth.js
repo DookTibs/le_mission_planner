@@ -4,6 +4,33 @@ var mission = {
 	legs: []
 };
 
+function loadMissionFromJSON(strData) {
+	strData = '{"name":"Test Mission Foo","notes":"notes","legs":[{"maneuver":{"difficulty":8,"from":"earth","to":"earth_orbit"},"payloadItems":[{"payload":{"name":"Astronaut","mass":0},"amount":"1"},{"payload":{"name":"Capsule: Eagle","mass":1},"amount":"1"}]}]}';
+	var obj = JSON.parse(strData);
+	console.log(obj);
+	mission.name = obj.name;
+	mission.notes = obj.notes;
+
+	mission.legs = [];
+	for (var i = 0 ; i < obj.legs.length ; i++) {
+		var l = obj.legs[i];
+		console.log(l);
+		console.log(l["maneuver"]);
+		var maneuver = getManeuverByEndpoints(l["maneuver"]["from"] + ":" + l["maneuver"]["to"]);
+		var leg = new ManeuverLeg(maneuver);
+
+		for (var k = 0 ; k < l["payloadItems"].length ; k++) {
+			var pi = l["payloadItems"][k];
+			var payload = getPayloadByName(pi["payload"]["name"]);
+			var amt = pi["amount"];
+			leg.payloadItems.push({ amount: amt, payload: payload });
+		}
+
+		mission.legs.push(leg);
+	}
+}
+
+
 function debugMission() {
 	var output = "<h3>" + mission.name + "</h3>";
 	output += "<h5>" + mission.legs.length + " leg" + (mission.legs.length == 1 ? "" : "s") + "</h5>";
@@ -94,16 +121,24 @@ function addOrRemovePopupItem() {
 	formatItemPopupRow(wrapperDiv);
 }
 
+var rowPrototype;
 function setup() {
+	rowPrototype = $("tr.leg").detach();
+
 	setupPayloadDialog();
 
 	var chartBuilder = new ChartBuilder();
 	chartBuilder.renderCharts();
 
-	setupOriginBox();
-	$("a.payload_picker").html("None").click(editPayload);
-	var l = new ManeuverLeg(null);
-	mission.legs.push(l);
+	// var l = new ManeuverLeg(null);
+	// mission.legs.push(l);
+
+	loadMissionFromJSON();
+
+	setupRowsAndHandlers();
+	// setupOriginBox();
+	// $("a.payload_picker").html("None").click(editPayload);
+
 	recalc();
 
 	// editPayload();
@@ -115,11 +150,30 @@ function setup() {
 	*/
 }
 
-function onOriginBoxChanged() {
-	var changedBox = $(this);
+function setupRowsAndHandlers() {
+	var legTable = $("table.mission_planner");
+	legTable.find("tr.leg").remove();
+	$("table.mission_planner tr.leg").remove();
+	for (var i = 0 ; i < mission.legs.length ; i++) {
+		var leg = mission.legs[i];
+		var row = rowPrototype.clone().appendTo(legTable);
+
+		setupOriginBox(row.find("td.origin select"), leg.maneuver.from);
+
+		console.log("ADSFFDSSDAFSDF");
+		console.log(leg);
+
+		// row.find("td.origin select").val(leg.maneuver.from);	
+		// row.find("td.destination select").val(leg.maneuver.to);	
+	}
+}
+
+function onOriginBoxChanged(changedBox) {
+	// var changedBox = $(this);
 	var changedRow = changedBox.parents("tr");
 	var legIndex = changedRow.index() - 1;
 	mission.legs[legIndex].maneuver = null;
+	console.log("origin box changed [" + changedBox.val() + "]");
 
 	if (changedBox.val() != -1) {
 		var origin = getLocationById(changedBox.val());
@@ -161,15 +215,19 @@ function recalcForRow(r) {
 }
 */
 
-function setupOriginBox() {
-	var originBox = $("td.origin select");
+function setupOriginBox(originBox, startVal) {
+	console.log("setting maneuever with [" + startVal + "]");
+	// var originBox = $("td.origin select");
 	$("<option value='-1'></option>").appendTo(originBox);
 	for (var i = 1 ; i < locations.length ; i++) { // start at 1 so we skip "Lost"
 		var loc = locations[i];
-		$("<option value='" + loc.id + "'>" + loc.name + "</option>").appendTo(originBox);
+		$("<option value='" + loc.id + "'" + (loc.id == startVal ? " selected" : "") + ">" + loc.name + "</option>").appendTo(originBox);
 	}
 
-	originBox.change(onOriginBoxChanged);
+	originBox.change(function() {
+		onOriginBoxChanged($(this));
+	});
+	onOriginBoxChanged(originBox);
 }
 
 function setPossibleDestinations(possibilities) {
